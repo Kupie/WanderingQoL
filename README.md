@@ -17,6 +17,9 @@
    - To instead be:
      - "Game Mute Hotkey with CTRL = B"
    - Would make the Game Mute/Unmute hotkey be Ctrl + B instead of Ctrl + M.
+3. If you would like a GUI to change settings easily, there is another BepInEx plugin that makes it so F1 opens a nice menu to do so: 
+   - https://github.com/BepInEx/BepInEx.ConfigurationManager/releases/
+   - Changes using the GUI still require a restart of the game (for now)
     
 ### Features
 
@@ -30,7 +33,7 @@
 #### Cheats
 - Allow up to 13 workers per building (Only works with Hotkeys, for now)
   - This is 13 because if there are more, the game marks the building as "Destroyed"
-  - 
+  
 ##### Debug
 - If enabled, will log to the BepInEx console. Useful for me when debugging/testing, end users shouldn't care about this.
 
@@ -41,4 +44,6 @@
 - Also pause game when losing Focus (Game doesn't use Unity's timescale to pause itself. Weird, right?)
 - Allow configuration in-game
 - Better Hotkey control for muting, such as having it be "Shift" + a key instead of only a "Ctrl" + a key 
+- Hotkey to toggle the focus/unfocus automute
+- Reloading config file when config file changes
 - *Maybe* figure out more than 13 workers per building
