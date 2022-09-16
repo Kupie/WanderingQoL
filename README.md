@@ -30,12 +30,15 @@
 #### Cheats
 - Allow up to 13 workers per building (Only works with Hotkeys, for now)
   - This is 13 because if there are more, the game marks the building as "Destroyed"
+  - 
+##### Debug
+- If enabled, will log to the BepInEx console. Useful for me when debugging/testing, end users shouldn't care about this.
 
 ##### Planned future Features
 - Skip Credits Videos (It seems that BepInEx does not load Chainloader till *after* the videos, so this has proved more difficult than expected
-- Use the GUI to add/remove cheat-enabled extra workers (also showing how many are set, currently going over the limit does not update the GUI)
+- Use the GUI to add cheat-enabled extra workers (also showing how many are set, currently going over the default limit does not update the GUI)
 - Adjust different game balance values of harvests/usage/etc.
-- Also pause game when not losing Focus (Game doesn't use Unity's timescale to pause itself. Weird, right?)
+- Also pause game when losing Focus (Game doesn't use Unity's timescale to pause itself. Weird, right?)
 - Allow configuration in-game
 - Better Hotkey control for muting, such as having it be "Shift" + a key instead of only a "Ctrl" + a key 
 - *Maybe* figure out more than 13 workers per building
