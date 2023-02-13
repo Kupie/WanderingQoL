@@ -19,7 +19,7 @@ namespace MainNameSpace
         public const string PluginVer = "1.0.0";
         public const string PluginTargetExe = "WanderingVillage.exe";
         internal static ManualLogSource Log;
-        private static readonly Harmony Harmony = new(PluginGuid);
+        
 
         // Config Bindings
         internal static ConfigEntry<bool> SkipWelcome;
@@ -34,6 +34,7 @@ namespace MainNameSpace
 
         private void Awake()
         {
+            var Harmony = new Harmony(PluginGuid);
             // Plugin startup logic
             Log = new ManualLogSource(PluginName);
             BepInEx.Logging.Logger.Sources.Add(Log);
@@ -81,6 +82,22 @@ namespace MainNameSpace
             }
         }
 
+
+        // Reload Config patch
+        //[HarmonyPatch(typeof(Game), nameof(Game.Update))]
+        //class Reloadconfig
+        //{
+        //    static void Postfix()
+        //    {
+        //        // If F5 hotkey is pressed, toggle Forced Mute
+        //        if (Input.GetKeyDown(KeyCode.F5))
+        //        {
+        //            ConfigFile.Reload();
+        //        }
+        //    }
+        //}
+
+                    
         //Automute patch. This postfix runs after the main "Game.Update" method, which runs every frame (I think) so it's a good one to hook into.
         [HarmonyPatch(typeof(Game), nameof(Game.Update))]
         class GameMuter
@@ -136,6 +153,24 @@ namespace MainNameSpace
             //               Console.WriteLine("Game Lost/Gained Focus");
             //           }
         }
+
+        // Disabling bug report button. 
+        // No I'm not disabling this feature. If a bug happens while using mods, I don't want to bother the
+        // game devs when it could be the mod's fault
+
+        [HarmonyPatch(typeof(TopBarDisplay), nameof(TopBarDisplay.UpdateUi))]
+        class HideBugReport
+        {
+            static void Postfix(TopBarDisplay __instance)
+            {
+                if (__instance.UserReportButton.interactable)
+                {
+                    D.L("Disabling User Report Button", "info"); 
+                    __instance.UserReportButton.interactable = false;                    
+                }
+            }
+        }
+
         //Hiding Socials Buttons from start screen
         [HarmonyPatch(typeof(StartScreenUi), nameof(StartScreenUi.Update))]
         class HideSocials1
@@ -143,11 +178,11 @@ namespace MainNameSpace
 
             static void Postfix(StartScreenUi __instance)
             {
-                if (RemoveSocials.Value && (__instance.DiscordButton.isActiveAndEnabled || __instance.FollowButton.isActiveAndEnabled || __instance.ForumButton.isActiveAndEnabled))
+                if (RemoveSocials.Value && (__instance.DiscordButton.isActiveAndEnabled || __instance.FollowButton.isActiveAndEnabled || __instance.RoadmapButton.isActiveAndEnabled))
                 {
 
                     D.L("Removing Socials Buttons off startup...", "info");
-                    __instance.ForumButton.SetActive(false);
+                    __instance.RoadmapButton.SetActive(false);
                     __instance.FollowButton.SetActive(false);
                     __instance.DiscordButton.SetActive(false);
                 }
@@ -179,6 +214,15 @@ namespace MainNameSpace
                 {
                     D.L("Removing Welcome Screen...", "info");
                     __instance.DemoWelcomeScreen.Show(false);
+                }
+
+            }
+            static void Prefix(StartScreenUi __instance)
+            {
+                if (Plugin.SkipWelcome.Value)
+                {
+                    D.L("Setting FirstSessionStart to false", "info");
+                    Game.Data.FirstSessionStart = false;
                 }
 
             }
