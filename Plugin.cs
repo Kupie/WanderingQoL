@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using UnityEngine;
@@ -163,10 +163,10 @@ namespace MainNameSpace
         {
             static void Postfix(TopBarDisplay __instance)
             {
-                if (__instance.UserReportButton.interactable)
+                if (__instance.UserReportButton.isActiveAndEnabled)
                 {
                     D.L("Disabling User Report Button", "info"); 
-                    __instance.UserReportButton.interactable = false;                    
+                    __instance.UserReportButton.SetActive(false);                    
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace MainNameSpace
         [HarmonyPatch(typeof(StartScreenUi), nameof(StartScreenUi.Update))]
         class HideSocials1
         {
-
+            static bool alreadyHidWelcomeScreen;
             static void Postfix(StartScreenUi __instance)
             {
                 if (RemoveSocials.Value && (__instance.DiscordButton.isActiveAndEnabled || __instance.FollowButton.isActiveAndEnabled || __instance.RoadmapButton.isActiveAndEnabled))
@@ -185,6 +185,19 @@ namespace MainNameSpace
                     __instance.RoadmapButton.SetActive(false);
                     __instance.FollowButton.SetActive(false);
                     __instance.DiscordButton.SetActive(false);
+                    D.L("Finding ButtonGuide_set...", "info");
+
+                    if (Plugin.SkipWelcome.Value && !alreadyHidWelcomeScreen)
+                    {
+                        GameObject welcomePanelFind = GameObject.Find("WelcomePanel");
+                        if (welcomePanelFind != null && welcomePanelFind.activeSelf)
+                        {
+                            Plugin.D.L("Hiding ButtonGuide_set!", "info");
+                            welcomePanelFind.SetActive(false);
+                            alreadyHidWelcomeScreen = true;
+                        }
+
+                    }
                 }
             }
         }
@@ -204,29 +217,6 @@ namespace MainNameSpace
             }
         }
 
-        //Skipping welcome screen
-        [HarmonyPatch(typeof(StartScreenUi), nameof(StartScreenUi.Awake))]
-        class SkipWelcomeClass
-        {
-            static void Postfix(StartScreenUi __instance)
-            {
-                if (Plugin.SkipWelcome.Value)
-                {
-                    D.L("Removing Welcome Screen...", "info");
-                    __instance.DemoWelcomeScreen.Show(false);
-                }
-
-            }
-            static void Prefix(StartScreenUi __instance)
-            {
-                if (Plugin.SkipWelcome.Value)
-                {
-                    D.L("Setting FirstSessionStart to false", "info");
-                    Game.Data.FirstSessionStart = false;
-                }
-
-            }
-        }
 
         // Trying to implement "cheats" portion into GUI...
         //[HarmonyPatch(typeof(WorkerSection), nameof(WorkerSection.Init))]
@@ -262,57 +252,29 @@ namespace MainNameSpace
         [HarmonyPatch(typeof(WorkerSection), nameof(WorkerSection.UpdateUi))]
         class PlusMinusHotkeys
         {
-            static void Postfix(World world, FieldOccupant occupant, WorkerSection __instance)
+            static void Postfix(World world,  FieldOccupant occupant, WorkerSection __instance)
             {
-                int maxWorkerCount = (int)occupant.Settings.Building.MaxWorkerCount;
-                int minWorkerCount = (int)occupant.Settings.Building.MinWorkerCount;
-                bool PlusAllowed = ((int)occupant.TargetWorkerCount < maxWorkerCount);
-                bool MinusAllowed = ((int)occupant.TargetWorkerCount > minWorkerCount);
-
-
-                //try
-                //{
-                //    Log.LogInfo(GameObject.Find("DeconstructButton").transform.position);
-                //}
-                //catch (Exception e)
-                //{
-                //    Log.LogError($" {e} ===== trying to find position of DeconstructButton");
-                //}
-                //if (ExtraWorkerLimits.Value && occupant.TargetWorkerCount < 13)
-                //{
-                //    __instance.PlusButton.interactable = true;
-                //}
-                //if (__instance.PlusButton.Pressed())
-                //{
-                //    occupant.TargetWorkerCount += 1;
-                //    Log.LogInfo($"Increased worker count to {occupant.TargetWorkerCount} via button");
-                //}
-                if (Input.GetKeyUp(PlusWorker.Value))
+                bool flag = occupant.FullStaffRequired();
+                int num = flag ? __instance._maxWorkerCount : 1;
+                int maxWorkers = __instance._maxWorkerCount;
+                // Set limit to 13 if using the cheat for it
+                if (Plugin.ExtraWorkerLimits.Value)
                 {
-
-                    if (Plugin.ExtraWorkerLimits.Value && occupant.TargetWorkerCount < 13)
-                    {
-                        occupant.TargetWorkerCount += 1;
-                        D.L($"Cheat Increased worker count to {occupant.TargetWorkerCount}", "info");
-                    }
-                    else if (PlusAllowed)
-                    {
-                        occupant.TargetWorkerCount = (byte)Mathf.Min((int)(occupant.TargetWorkerCount + 1), maxWorkerCount);
-                        D.L($"Increased worker count to {occupant.TargetWorkerCount}", "info");
-                    }
-                    // Some day I hope to draw the number of workers somewhere, since you can't see
-                    // how many you add via the "cheat" feature
-                    //if (occupant.TargetWorkerCount > maxWorkerCount)
-                    //{
-                    //    GUI.Label(new Rect(10, 10, 100, 20), occupant.TargetWorkerCount.ToString());
-                    //}
-
+                    maxWorkers = 13;
                 }
-                if (Input.GetKeyUp(Plugin.MinusWorker.Value) && MinusAllowed)
+                if (Input.GetKeyUp(Plugin.PlusWorker.Value))
                 {
-                    occupant.TargetWorkerCount = (byte)Mathf.Max((int)(occupant.TargetWorkerCount - 1), 0);
-                    D.L($"Decreased worker count to {occupant.TargetWorkerCount}", "info");
+                    occupant.TargetWorkerCount = (byte)Mathf.Min((int)occupant.TargetWorkerCount + num, maxWorkers);
+                    D.L("Updated Max Workers: " + occupant.TargetWorkerCount.ToString(), "info");
+                    __instance.UpdateButtonVisuals(occupant, flag, false);
                 }
+                if (Input.GetKeyUp(Plugin.MinusWorker.Value))
+                {
+                    occupant.TargetWorkerCount = (byte)Mathf.Max((int)occupant.TargetWorkerCount - num, 0);
+                    D.L("Updated Max Workers: " + occupant.TargetWorkerCount.ToString(), "info");
+                    __instance.UpdateButtonVisuals(occupant, flag, false);
+                }
+
             }
         }
 
