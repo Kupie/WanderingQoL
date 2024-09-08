@@ -1,9 +1,9 @@
 # WanderingQoL
 
-##### Built for Wandering Village v0.1.32
+##### Built for Wandering Village v0.7.10
 
 ## Installation
-1. Requires BepInEx 5.4.x to be installed: https://github.com/BepInEx/BepInEx/releases/tag/v5.4.21
+1. Requires BepInEx 5.x to be installed: https://github.com/BepInEx/BepInEx/releases/latest
 2. Place Release .dll file into \<Game Install Location\>\The Wandering Village\Windows64\BepInEx\plugins\
 3. ### Do *not* bother the Game Devs if there are any crashes while using mods
 
