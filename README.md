@@ -1,4 +1,4 @@
-# WanderingQoL
+# WanderingQoL: A set of mods for Wandering Village
 
 ##### Built for Wandering Village v0.7.10
 
