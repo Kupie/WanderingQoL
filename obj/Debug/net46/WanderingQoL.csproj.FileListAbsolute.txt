@@ -1,3 +1,0 @@
-C:\Users\Admin\Documents\Coding\WanderingQoL\obj\Debug\net46\WanderingQoL.csprojResolveAssemblyReference.cache
-C:\Users\Admin\Documents\Coding\WanderingQoL\obj\Debug\net46\PluginInfo.cs
-C:\Users\Admin\Documents\Coding\WanderingQoL\obj\Debug\net46\WanderingQoL.AssemblyInfo.cs
