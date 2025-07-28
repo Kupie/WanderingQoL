@@ -1,6 +1,6 @@
 # WanderingQoL: A set of mods for Wandering Village
 
-##### Built for Wandering Village v0.7.10
+##### Built for Wandering Village v1.0
 
 ## Installation
 1. Requires BepInEx 5.x to be installed: https://github.com/BepInEx/BepInEx/releases/latest
@@ -22,6 +22,7 @@
 
 #### General
 - Remove "Welcome" Splash Screen (Default on)
+- Disable Survey popup (Default on)
 - Remove Social Media (Discord/Forum) links (Default on)
 - Mute when Game loses focus (Default on)
 - Hotkey for muting/unmuting the Game (Default Ctrl + M)
@@ -30,6 +31,7 @@
 #### Cheats
 - Allow up to 13 workers per building (Only works with Hotkeys, for now)
   - This is 13 because if there are more, the game marks the building as "Destroyed"
+  - Shows worker counts in the building name, since the GUI does not reflect the cheat
 
 ##### Planned future Features
 - Skip Credits Videos (It seems that BepInEx does not load Chainloader till *after* the videos, so this has proved more difficult than expected
